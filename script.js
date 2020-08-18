@@ -3,17 +3,35 @@ const imageContainer = document.getElementById('image-container');
 const loader = document.getElementById('loader')
 
 // photo array
-
+let ready = false;
+let imagesLoaded = 0
 let photoArray = [];
 const count = 10;
-//  
+//  sets attributes to created elements
 const setAttributes = (element, attribute) =>{
     for(const key in attribute) {
         element.setAttribute(key, attribute[key])
     }
 }
 
+// check if all images are loaded
+
+const imageLoaded = ()=>{
+    console.log('image loaded')
+    imagesLoaded ++;
+    console.log(imagesLoaded)
+    if(imagesLoaded === totalImages){
+       // if imagesloaded is equal to the total images ready is then set to true which will run the async function
+        ready = true;
+        loader.hidden = true;
+        
+        // when all the images have loaded we hide the loading bar
+    }
+}
+
 const displayPhotos = () => {
+    imagesLoaded =0;
+     totalImages = photoArray.length;
     photoArray.forEach((photo)=>{
         const item = document.createElement('a');
         setAttributes(item, {
@@ -28,14 +46,14 @@ const displayPhotos = () => {
             title: photo.description
         })
 
+        // event listener to check when the image has finished loading
+        img.addEventListener('load',imageLoaded)
         item.appendChild(img);
         imageContainer.appendChild(item)
+        
 
     })
 }
-
-
-
 
 // Api Url and apikey
 const url = "https://api.unsplash.com/photos/random/?count=" +count;
@@ -64,6 +82,12 @@ const getRandomImages = async () =>{
     }
 }
 
+window.addEventListener('scroll', ()=>{
+    if(window.innerHeight + window.scrollY >= document.body.offsetHeight-1000 && ready){
+       ready = false;
+        getRandomImages()
+    }
+})
 
 getRandomImages();
-console.log(photoArray)
+
